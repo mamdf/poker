@@ -26,3 +26,5 @@ from poker.constants import (
     Position,
 )
 from poker.strategy import Strategy
+
+from poker.board import Board
