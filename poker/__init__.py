@@ -23,3 +23,5 @@ from poker.hand import (
     Shape,
 )
 from poker.strategy import Strategy
+
+from poker.board import Board
