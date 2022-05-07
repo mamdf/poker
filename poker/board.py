@@ -43,6 +43,11 @@ class Board(_ReprMixin):
 
         return result
 
+    def __eq__(self, other):
+        if self.__class__ is other.__class__:
+            return self.cards == other.cards
+        return NotImplemented
+
     def _set_cards(self, first, second, third, turn, river):
         self.cards = sorted([Card(first), Card(second), Card(third)], reverse=True)
         if turn:

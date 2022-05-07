@@ -164,5 +164,15 @@ def test_has_flushdraw():
     assert board.has_flushdraw is False
 
 
+def test_compare_boards():
+    board1 = Board("AcKcQhJs")
+    board2 = Board("QhKcAcJs")
+    assert board1 == board2
+    board1.add_cards("2c")
+    assert board1 != board2
+    board2.add_cards("2c")
+    assert board1 == board2
+
+
 
 
