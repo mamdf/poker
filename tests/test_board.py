@@ -15,6 +15,12 @@ def test_cards_are_Card_instances():
     assert isinstance(board.river, Card)
 
 
+def test_from_cards():
+    board = Board.from_cards([Card("Qh"), Card("Kd"), Card("Ac"), Card("Ad")])
+    assert isinstance(board, Board)
+    assert board.cards == [Card("Ac"), Card("Kd"), Card("Qh"), Card("Ad")]
+
+
 def test_flop_is_three_cards():
     board = Board("AsKcQh2c3h")
     assert len(board.flop) == 3

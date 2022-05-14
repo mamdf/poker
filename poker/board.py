@@ -29,6 +29,16 @@ class Board(_ReprMixin):
 
         return self
 
+    @classmethod
+    def from_cards(cls, cards):
+        """
+        Create a board from a list of cards.
+        """
+        board = ""
+        for card in cards:
+            board += card.rank.val + card.suit.val
+        return Board(board)
+
     def __str__(self):
         result = ''
         for card in self.cards:
