@@ -167,3 +167,11 @@ class Board(_ReprMixin):
             for first, second in self._all_combinations
         )
 
+    @property
+    def value(self):
+        result = ''
+        for card in self.cards:
+            result += card.value
+
+        return result
+

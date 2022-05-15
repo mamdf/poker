@@ -180,5 +180,12 @@ def test_compare_boards():
     assert board1 == board2
 
 
+def test_value():
+    board = Board("AcKcQhJs")
+    assert board.value == "AcKcQhJs"
+    board.add_cards("Ad")
+    assert board.value == "AcKcQhJsAd"
+
+
 
 

@@ -111,3 +111,7 @@ class Card(_ReprMixin, metaclass=_CardMeta):
     @property
     def is_broadway(self):
         return self.rank in BROADWAY_RANKS
+
+    @property
+    def value(self):
+        return f"{self.rank.val}{self.suit.value[1]}"
