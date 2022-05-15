@@ -59,11 +59,11 @@ class Board(_ReprMixin):
         return NotImplemented
 
     def _set_cards(self, first, second, third, turn, river):
-        self.cards = sorted([Card(first), Card(second), Card(third)], reverse=True)
+        self._cards = sorted([Card(first), Card(second), Card(third)], reverse=True)
         if turn:
-            self.cards.append(Card(turn))
+            self._cards.append(Card(turn))
         if river:
-            self.cards.append(Card(river))
+            self._cards.append(Card(river))
 
     def add_cards(self, cards):
         if len(cards) == 2:
@@ -83,7 +83,7 @@ class Board(_ReprMixin):
             if card in self.cards:
                 raise ValueError(f"{card!r}, already in board {self.cards}")
 
-        self.cards.extend(cards)
+        self._cards.extend(cards)
         self._create_all_combinations()  # create new combinations
 
     def _create_all_combinations(self):
@@ -160,6 +160,10 @@ class Board(_ReprMixin):
     def river(self):
         if len(self.cards) == 5:
             return self.cards[4]
+
+    @property
+    def cards(self):
+        return tuple(self._cards)
 
     def _get_differences(self):
         return (
