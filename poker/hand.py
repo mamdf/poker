@@ -360,6 +360,10 @@ class Combo(_ReprMixin):
     def shape(self, value):
         self._shape = Shape(value).val
 
+    @property
+    def value(self):
+        return f"{self.first.value}{self.second.value}"
+
 
 class _RegexRangeLexer:
     _separator_re = re.compile(r"[,;\s]+")

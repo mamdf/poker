@@ -171,3 +171,9 @@ def test_to_hand_converter_method():
 
 def test_pairs_are_not_offsuits():
     assert Combo("2s2c").is_offsuit is False
+
+
+def test_value():
+    assert Combo("2s2c").value == "2s2c"
+    assert Combo("KhAs").value == "AsKh"
+    assert Combo("ThTd").value == "ThTd"

@@ -140,3 +140,7 @@ def test_hash():
 
 def test_putting_them_in_set_doesnt_raise_Exception():
     {Card("As"), Card("Kc")}
+
+
+def test_value():
+    assert Card("As").value == "As"
