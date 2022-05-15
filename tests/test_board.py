@@ -16,9 +16,9 @@ def test_cards_are_Card_instances():
 
 
 def test_from_cards():
-    board = Board.from_cards([Card("Qh"), Card("Kd"), Card("Ac"), Card("Ad")])
+    board = Board.from_cards((Card("Qh"), Card("Kd"), Card("Ac"), Card("Ad")))
     assert isinstance(board, Board)
-    assert board.cards == [Card("Ac"), Card("Kd"), Card("Qh"), Card("Ad")]
+    assert board.cards == (Card("Ac"), Card("Kd"), Card("Qh"), Card("Ad"))
 
 
 def test_flop_is_three_cards():
