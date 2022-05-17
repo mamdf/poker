@@ -58,6 +58,9 @@ class Board(_ReprMixin):
             return self.cards == other.cards
         return NotImplemented
 
+    def __len__(self):
+        return len(self.cards)
+
     def _set_cards(self, first, second, third, turn, river):
         self._cards = sorted([Card(first), Card(second), Card(third)], reverse=True)
         if turn:
