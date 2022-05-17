@@ -41,14 +41,20 @@ def test_turn_and_river_are_present():
     board = Board("AsKcQh2c3h")
     assert board.turn == Card("2c")
     assert board.river == Card("3h")
+    assert len(board) == 5
     # add_cards
     board = Board("AsKcQh")
+    assert len(board) == 3
     board.add_cards("2c")
+    assert len(board) == 4
     board.add_cards("3h")
+    assert len(board) == 5
     assert board.river == Card("3h")
 
     board = Board("AsKcQh")
+    assert len(board) == 3
     board.add_cards("AcAd")
+    assert len(board) == 5
     assert board.turn == Card("Ac")
     assert board.river == Card("Ad")
 
