@@ -26,10 +26,10 @@ class Rank(PokerEnum):
     EIGHT = "8", 8
     NINE = "9", 9
     TEN = "T", 10
-    JACK = ("J",)
-    QUEEN = ("Q",)
-    KING = ("K",)
-    ACE = "A", 1
+    JACK = "J", 11
+    QUEEN = "Q", 12
+    KING = "K", 13
+    ACE = "A", 14, 1
 
     @classmethod
     def difference(cls, first, second):
