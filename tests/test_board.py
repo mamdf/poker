@@ -1,5 +1,5 @@
 import pytest
-from poker.card import Card
+from poker.card import Card, Rank
 from poker.board import Board
 
 
@@ -160,6 +160,8 @@ def test_has_straightdraw():
     assert board.has_straightdraw is True
     board = Board("5c9cKd")
     assert board.has_straightdraw is False
+    board = Board("Ac3c9d")
+    assert board.has_straightdraw is True
 
 
 def test_has_gutshot():
@@ -191,6 +193,38 @@ def test_value():
     assert board.value == "AcKcQhJs"
     board.add_cards("Ad")
     assert board.value == "AcKcQhJsAd"
+
+
+def test_straight_ranks():
+    board = Board("AcKcQhJs")
+    assert board._get_straight_ranks() == [1, 11, 12, 13, 14]
+    board.add_cards("4d")
+    assert board._get_straight_ranks() == [1, 4, 11, 12, 13, 14]
+
+    board = Board("3d3c3h")
+    assert board._get_straight_ranks() == [3]
+    board.add_cards("As")
+    assert board._get_straight_ranks() == [1, 3, 14]
+    board.add_cards("Tc")
+    assert board._get_straight_ranks() == [1, 3, 10, 14]
+
+
+def test_possible_straights():
+    board = Board("Ac9cJs")
+    assert board.get_possible_straights(num_cards=1) == []
+    assert board.get_possible_straights(num_cards=2) == []
+    board.add_cards("Kd")
+    assert board.get_possible_straights(num_cards=1) == []
+    assert board.get_possible_straights(num_cards=2) == [[Rank("T"), Rank("Q")]]
+    board.add_cards("Qh")
+    assert board.get_possible_straights(num_cards=1) == [[Rank("T")]]
+
+    board = Board("Ad3dQc5sTs")
+    assert board.get_possible_straights(num_cards=1) == []
+    assert board.get_possible_straights(num_cards=2) == [[Rank("2"), Rank("4")], [Rank("J"), Rank("K")]]
+
+    board = Board("6s4s7s")
+    assert board.get_possible_straights(num_cards=2) == [[Rank("3"), Rank("5")], [Rank("5"), Rank("8")]]
 
 
 
