@@ -99,6 +99,42 @@ class Board(_ReprMixin):
                 raise ValueError(f"{comb}, Pair can't have the same suit: {comb[0].suit!r}")
 
         self._all_ranks_counter = collections.Counter(card.rank for card in self.cards)
+        self._straight_ranks = self._get_straight_ranks()
+
+    def _get_straight_ranks(self) -> list:
+        """return all unique rank cards as integers (Ace is 14 and 1)"""
+        result = set(card.rank.value[1] for card in self.cards)
+        # if As (14) in result append rank 1
+        if 14 in result:
+            result.add(1)
+        return sorted(result)
+
+    def get_possible_straights(self, num_cards=2) -> list:
+        """
+        num_cards: number of cards to complete a straight
+        return: list of possible straights
+        """
+        result = []
+        for i in range(len(self._straight_ranks)):
+            # select number i + (5 - num_cards) items if exists
+            n = (5 - num_cards)
+            if i + n <= len(self._straight_ranks):
+                # select n items from numbers
+                ranks_split = self._straight_ranks[i:i + n]
+                # create a range of numbers from the first to the last of the consecutive numbers
+                range_of_numbers = range(max(1, ranks_split[0] - num_cards), min(ranks_split[-1] + num_cards + 1, 15))
+                for j in range(len(range_of_numbers)):
+                    if j + 5 <= len(range_of_numbers):
+                        # select 5 items from range_of_numbers
+                        range_of_numbers_5 = range_of_numbers[j:j + 5]
+                        # check if the consecutive numbers are in the range of numbers
+                        if all([x in range_of_numbers_5 for x in ranks_split]):
+                            # append the ranks needed to complete the straight
+                            str_ranks = [Rank(x) for x in range_of_numbers_5 if x not in ranks_split]
+                            if str_ranks not in result:
+                                result.append(str_ranks)
+
+        return result
 
     @property
     def is_rainbow(self):
@@ -114,9 +150,7 @@ class Board(_ReprMixin):
 
     @property
     def has_pair(self):
-        return any(
-            first.rank == second.rank for first, second in self._all_combinations
-        )
+        return self._all_ranks_counter.most_common(1)[0][1] >= 2
 
     @property
     def has_double(self):
@@ -169,10 +203,8 @@ class Board(_ReprMixin):
         return tuple(self._cards)
 
     def _get_differences(self):
-        return (
-            Rank.difference(first.rank, second.rank)
-            for first, second in self._all_combinations
-        )
+        """get differences between a sorted list numbers in self._straight_ranks"""
+        return [y - x for x, y in zip(self._straight_ranks, self._straight_ranks[1:])]
 
     @property
     def value(self):
