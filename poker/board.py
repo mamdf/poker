@@ -7,6 +7,9 @@ __all__ = [
     "Board"
 ]
 
+RANKING_NAMES = ("high_card", "pair", "two_pair", "three_of_a_kind", "straight", "flush", "full_house",
+                 "four_of_a_kind", "straight_flush")
+
 
 class Board(_ReprMixin):
     """
@@ -98,6 +101,7 @@ class Board(_ReprMixin):
             if comb[0] == comb[1]:
                 raise ValueError(f"{comb}, Pair can't have the same suit: {comb[0].suit!r}")
 
+        self._suits = collections.Counter(card.suit for card in self.cards)
         self._all_ranks_counter = collections.Counter(card.rank for card in self.cards)
         self._straight_ranks = self._get_straight_ranks()
 
@@ -154,6 +158,8 @@ class Board(_ReprMixin):
 
     @property
     def has_double(self):
+        if len(self._all_ranks_counter) < 2:
+            return False
         result = self._all_ranks_counter.most_common(2)
         return result[0][1] >= 2 and result[1][1] >= 2
 
@@ -162,13 +168,28 @@ class Board(_ReprMixin):
         return self._all_ranks_counter.most_common(1)[0][1] >= 3
 
     @property
+    def has_straight(self):
+        ranks_diff = self._get_differences()
+        return ranks_diff.count(1) == 4
+
+    @property
+    def has_flush(self):
+        return self.suit_count == 5
+
+    @property
     def has_full_house(self):
+        if len(self._all_ranks_counter) < 2:
+            return False
         result = self._all_ranks_counter.most_common(2)
         return result[0][1] == 3 and result[1][1] == 2
 
     @property
     def has_quad(self):
         return self._all_ranks_counter.most_common(1)[0][1] == 4
+
+    @property
+    def has_straight_flush(self):
+        return self.has_straight and self.has_flush
 
     @property
     def has_straightdraw(self):
@@ -183,6 +204,39 @@ class Board(_ReprMixin):
         return any(
             first.suit == second.suit for first, second in self._all_combinations
         )
+
+    @property
+    def suit_count(self) -> int:
+        return self._suits.most_common(1)[0][1]
+
+    @property
+    def best_ranking(self) -> int:
+        """
+        return the best ranking of the board (8 to 0)
+        """
+        if self.has_straight_flush:
+            return 8
+        if self.has_quad:
+            return 7
+        if self.has_full_house:
+            return 6
+        if self.has_flush:
+            return 5
+        if self.has_straight:
+            return 4
+        if self.has_trip:
+            return 3
+        if self.has_double:
+            return 2
+        if self.has_pair:
+            return 1
+        return 0
+
+    def best_ranking_name(self) -> str:
+        """
+        return the best ranking name of the board
+        """
+        return RANKING_NAMES[self.best_ranking]
 
     @property
     def flop(self):
@@ -213,4 +267,3 @@ class Board(_ReprMixin):
             result += card.value
 
         return result
-
