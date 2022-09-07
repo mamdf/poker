@@ -153,6 +153,10 @@ class Board(_ReprMixin):
         )
 
     @property
+    def get_higher_ranks(self):
+        return sorted(self._all_ranks_counter.keys(), reverse=True)
+
+    @property
     def has_pair(self):
         return self._all_ranks_counter.most_common(1)[0][1] >= 2
 

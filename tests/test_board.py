@@ -178,6 +178,13 @@ class TestBoardRanking:
     board_quads = Board("2c2d2h2s")
     board_straight_flush = Board("AcKcQcJcTc")
 
+    def test_high_ranks(self):
+        assert self.board_high_card.get_higher_ranks == [Rank("A"), Rank("K"), Rank("Q"), Rank("J")]
+        board = Board("5c2cKd")
+        board.add_cards("AcQs")
+        assert board.get_higher_ranks == [Rank("A"), Rank("K"), Rank("Q"), Rank("5"), Rank("2")]
+        assert self.board_trips.get_higher_ranks == [Rank("2")]
+
     def test_has_pair(self):
         assert self.board_pair.has_pair is True
         assert self.board_high_card.has_pair is False
