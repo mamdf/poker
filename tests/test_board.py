@@ -111,6 +111,23 @@ def test_invalid_add_cards():
         board.add_cards("5d")
 
 
+def test_compare_boards():
+    board1 = Board("AcKcQhJs")
+    board2 = Board("QhKcAcJs")
+    assert board1 == board2
+    board1.add_cards("2c")
+    assert board1 != board2
+    board2.add_cards("2c")
+    assert board1 == board2
+
+
+def test_value():
+    board = Board("AcKcQhJs")
+    assert board.value == "AcKcQhJs"
+    board.add_cards("Ad")
+    assert board.value == "AcKcQhJsAd"
+
+
 def test_is_rainbow():
     board = Board("AcKdQhJs")
     assert board.is_rainbow is True
@@ -125,34 +142,6 @@ def test_is_monotone():
     assert board.is_monotone is True
     board = Board("AcKcQcJcTd")
     assert board.is_monotone is False
-
-
-def test_has_pair():
-    board = Board("AcKcKdQd")
-    assert board.has_pair is True
-    board = Board("AcKcQd")
-    assert board.has_pair is False
-
-
-def test_has_double():
-    board = Board("AcKcQdQhKh")
-    assert board.has_double is True
-    board = Board("AcKcQdQh")
-    assert board.has_double is False
-
-
-def test_has_trip():
-    board = Board("2c2d2h")
-    assert board.has_trip is True
-    board = Board("2c2dKcKd")
-    assert board.has_trip is False
-
-
-def test_has_quad():
-    board = Board("2c2d2h2s")
-    assert board.has_quad is True
-    board = Board("2c2d2hKcKd")
-    assert board.has_quad is False
 
 
 def test_has_straightdraw():
@@ -178,21 +167,75 @@ def test_has_flushdraw():
     assert board.has_flushdraw is False
 
 
-def test_compare_boards():
-    board1 = Board("AcKcQhJs")
-    board2 = Board("QhKcAcJs")
-    assert board1 == board2
-    board1.add_cards("2c")
-    assert board1 != board2
-    board2.add_cards("2c")
-    assert board1 == board2
+class TestBoardRanking:
+    board_high_card = Board("AcKdQhJs")
+    board_pair = Board("AcKcKdQd")
+    board_double = Board("AcKcQdQhKh")
+    board_trips = Board("2c2d2h")
+    board_straight = Board("AcKcQdJhTh")
+    board_flush = Board("8s7s6s5sTs")
+    board_full_house = Board("2c2d2hKcKh")
+    board_quads = Board("2c2d2h2s")
+    board_straight_flush = Board("AcKcQcJcTc")
 
+    def test_has_pair(self):
+        assert self.board_pair.has_pair is True
+        assert self.board_high_card.has_pair is False
 
-def test_value():
-    board = Board("AcKcQhJs")
-    assert board.value == "AcKcQhJs"
-    board.add_cards("Ad")
-    assert board.value == "AcKcQhJsAd"
+    def test_has_double(self):
+        assert self.board_double.has_double is True
+        assert self.board_pair.has_double is False
+        assert self.board_trips.has_double is False
+
+    def test_has_trip(self):
+        assert self.board_trips.has_trip is True
+        assert self.board_double.has_trip is False
+
+    def test_has_straight(self):
+        board = Board("AcKcQhJs")
+        assert board.has_straight is False
+        board.add_cards("Ts")
+        assert board.has_straight is True
+
+        board = Board("Ac2c4c5c")
+        assert board.has_straight is False
+        assert self.board_straight.has_straight is True
+        assert self.board_trips.has_straight is False
+
+    def test_has_flush(self):
+        board = Board("Ac4c5c6c")
+        assert board.has_flush is False
+        board.add_cards("Tc")
+        assert board.has_flush is True
+
+        board = Board("8d7s6s5sTs")
+        assert board.has_flush is False
+        assert self.board_flush.has_flush is True
+        assert self.board_trips.has_flush is False
+
+    def test_has_full_house(self):
+        assert self.board_full_house.has_full_house is True
+        assert self.board_trips.has_full_house is False
+
+    def test_has_quad(self):
+        assert self.board_quads.has_quad is True
+        assert self.board_full_house.has_quad is False
+
+    def test_straight_flush(self):
+        assert self.board_straight_flush.has_straight_flush is True
+        assert self.board_flush.has_straight_flush is False
+        assert self.board_straight.has_straight_flush is False
+
+    def test_best_ranking(self):
+        assert self.board_high_card.best_ranking == 0
+        assert self.board_pair.best_ranking == 1
+        assert self.board_double.best_ranking == 2
+        assert self.board_trips.best_ranking == 3
+        assert self.board_straight.best_ranking == 4
+        assert self.board_flush.best_ranking == 5
+        assert self.board_full_house.best_ranking == 6
+        assert self.board_quads.best_ranking == 7
+        assert self.board_straight_flush.best_ranking == 8
 
 
 def test_straight_ranks():
@@ -225,7 +268,3 @@ def test_possible_straights():
 
     board = Board("6s4s7s")
     assert board.get_possible_straights(num_cards=2) == [[Rank("3"), Rank("5")], [Rank("5"), Rank("8")]]
-
-
-
-
