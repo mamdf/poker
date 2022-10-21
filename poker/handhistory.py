@@ -21,6 +21,18 @@ class _Player:
     seat = attr.ib()
     combo = attr.ib()
 
+    def __hash__(self):
+        return hash(self.name)
+
+
+@attr.s(slots=True)
+class _PlayerResult:
+    """Player participating in the hand history net result."""
+
+    name = attr.ib()
+    seat = attr.ib()
+    net = attr.ib()
+
 
 @attr.s(slots=True)
 class _PlayerAction:
