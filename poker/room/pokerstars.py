@@ -3,6 +3,7 @@ import typing as t
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
+from functools import cache
 
 import attr
 import pytz
@@ -19,7 +20,7 @@ __all__ = ["PokerStarsHandHistory", "Notes"]
 
 @implementer(hh.IStreet)
 class _Street(hh._BaseStreet):
-    _collected_re = re.compile(r"(.+) collected \$(\d+(\.\d+)?) from pot")
+    _collected_re = re.compile(r"(.+) collected (?:\$|£|€)(\d+(\.\d+)?) from pot")
 
     def _parse_cards(self, boardline):
         self.cards = (Card(boardline[1:3]), Card(boardline[4:6]), Card(boardline[7:9]))
@@ -38,7 +39,7 @@ class _Street(hh._BaseStreet):
                 action = self._parse_muck(line)
             elif ' said, "' in line:  # skip chat lines
                 continue
-            elif ":" in line:
+            elif ": " in line:
                 action = self._parse_player_action(line)
             elif "joins" in line or "leaves" in line or "connected" in line or "timed out" in line or "failing to post" in line:
                 pass
@@ -56,13 +57,13 @@ class _Street(hh._BaseStreet):
         amount = line[first_paren_index + 1: second_paren_index]
         name_start_index = line.find("to ") + 3
         name = line[name_start_index:]
-        return name, Action.RETURN, Decimal(amount.strip("$"))
+        return name, Action.RETURN, Decimal(amount.strip("$£€"))
 
     def _parse_collected(self, line):
         match = self._collected_re.match(line)
         name = match.group(1)
         amount = match.group(2)
-        self.pot = Decimal(amount.strip("$"))
+        self.pot = Decimal(amount.strip("$£€"))
 
         return name, Action.WIN, self.pot
 
@@ -80,7 +81,7 @@ class _Street(hh._BaseStreet):
         if "folds" in line:
             amount = None
         else:
-            amount = amount.strip("$")
+            amount = amount.strip("$£€")
 
         # No action when player simply shows hand
         if action == "shows":
@@ -101,12 +102,12 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     _split_re = re.compile(r" ?\*\*\* ?\n?|\n")
     _header_re = re.compile(
         r"""
-                        ^PokerStars\s+                                # Poker Room
+                        .*PokerStars\s+                               # Poker Room
                         Hand\s+\#(?P<ident>\d+):\s+                   # Hand history id
                         (Tournament\s+\#(?P<tournament_ident>\d+),\s+ # Tournament Number
                          ((?P<freeroll>Freeroll)|(                    # buyin is Freeroll
-                          \$?(?P<buyin>\d+(\.\d+)?)                   # or buyin
-                          (\+\$?(?P<rake>\d+(\.\d+)?))?               # and rake
+                          (?:\$|£|€)?(?P<buyin>\d+(\.\d+)?)                   # or buyin
+                          (\+(?:\$|£|€)?(?P<rake>\d+(\.\d+)?))?               # and rake
                           (\s+(?P<currency>[A-Z]+))?                  # and currency
                          ))\s+
                         )?
@@ -115,8 +116,8 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
                         (-\s+Level\s+(?P<tournament_level>\S+)\s+)?   # Level (optional)
                         \(
                          (((?P<sb>\d+)/(?P<bb>\d+))|(                 # tournament blinds
-                          \$(?P<cash_sb>\d+(\.\d+)?)/                 # cash small blind
-                          \$(?P<cash_bb>\d+(\.\d+)?)                  # cash big blind
+                          (?:\$|£|€)(?P<cash_sb>\d+(\.\d+)?)/                 # cash small blind
+                          (?:\$|£|€)(?P<cash_bb>\d+(\.\d+)?)                  # cash big blind
                           (\s+(?P<cash_currency>\S+))?                # cash currency
                          ))
                         \)\s+
@@ -129,21 +130,21 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         r"^Table '(.*)' (\d+)-max Seat #(?P<button>\d+) is the button"
     )
     _seat_re = re.compile(
-        r"^Seat (?P<seat>\d+): (?P<name>.+?) \(\$?(?P<stack>\d+(\.\d+)?) in chips\)"
+        r"^Seat (?P<seat>\d+): (?P<name>.+?) \((?:\$|£|€)?(?P<stack>\d+(\.\d+)?) in chips\)"
     )  # noqa
     _blind_re = re.compile(
-        r"^(?P<name>.+?): posts (?P<blind>small|big|small & big) blind(?:s)? \$(?P<amount>\d+(\.\d+)?)")
+        r"^(?P<name>.+?): posts (?P<blind>small|big|small & big) blind(?:s)? (?:\$|£|€)(?P<amount>\d+(\.\d+)?)")
     _hero_re = re.compile(r"^Dealt to (?P<hero_name>.+?) \[(..) (..)\]")
-    _pot_re = re.compile(r"^Total pot \$(\d+(?:\.\d+)?) .*\| Rake \$(\d+(?:\.\d+)?)")
+    _pot_re = re.compile(r"^Total pot (?:\$|£|€)(\d+(?:\.\d+)?) .*\| Rake (?:\$|£|€)(\d+(?:\.\d+)?)")
     _winner_re = re.compile(
-        r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}collected \(\$(\d+(?:\.\d+)?)\)")
+        r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}collected \((?:\$|£|€)(\d+(?:\.\d+)?)\)")
     _showdown_re = re.compile(
-        r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}showed \[.+?\] and won \(\$?(\d+(?:\.\d+)?)\) with \w+?")
+        r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}showed \[.+?\] and won \((?:\$|£|€)?(\d+(?:\.\d+)?)\) with \w+?")
     _ante_re = re.compile(r".*posts the ante (\d+(?:\.\d+)?)")
     _board_re = re.compile(r"(?<=[\[ ])(..)(?=[\] ])")
     _action_re = re.compile(
-        r"(?P<name>.+?): (?P<action>.+?) \$?(?P<amount>\d+(?:\.\d+)?)?( to )?\$?(?P<total_amount>\d+(?:\.\d+)?)?")
-    _uncalled_bet_re = re.compile(r"^Uncalled bet \(\$?(?P<amount>\d+(?:\.\d+)?)\) returned to (?P<name>.+)")
+        r"(?P<name>.+?): (?P<action>.+?) (?:\$|£|€)?(?P<amount>\d+(?:\.\d+)?)?( to )?(?:\$|£|€)?(?P<total_amount>\d+(?:\.\d+)?)?")
+    _uncalled_bet_re = re.compile(r"^Uncalled bet \((?:\$|£|€)?(?P<amount>\d+(?:\.\d+)?)\) returned to (?P<name>.+)")
 
     def parse_header(self):
         # sections[0] is before HOLE CARDS
@@ -335,7 +336,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         # Blinds
         blind_actions = list()
         for line in self._splitted[:self._sections[0]]:
-            if "posts" in line:
+            if " posts " in line:
                 blind_actions.append(line)
         # Streets
         for street, street_name in ((blind_actions + list(self.preflop_actions), "preflop"),
