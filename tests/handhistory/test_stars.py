@@ -627,3 +627,21 @@ class TestPlayerNameWithDot:
         player_names = [p.name for p in hand.players]
         player_index = player_names.index(".prestige.U$")
         assert hand.players[player_index].stack == 3000
+
+
+class TestCashZoom:
+    hand_text = stars_hands.HAND6
+
+    @pytest.mark.parametrize(
+        ("attribute", "expected_value"),
+        [
+            ("hero", _Player(name="Hero or Dead", stack=5.14, seat=2, combo=Combo("Qs5h"))),
+            ("bb", Decimal("0.05")),
+            ("sb", Decimal("0.02")),
+            ("total_pot", Decimal(0.12)),
+            ("rake", Decimal(0))
+
+        ],
+    )
+    def test_body(self, hand, attribute, expected_value):
+        assert getattr(hand, attribute) == expected_value

@@ -253,3 +253,35 @@ Seat 6: W2lkm2n folded before Flop (didn't bet)
 Seat 7: sednanref folded before Flop (didn't bet)
 Seat 8: daoudi007708 folded on the River
 Seat 9: IPODpoker88 folded before Flop (didn't bet)"""
+
+
+HAND6 = """PokerStars Zoom Hand #243531165515:  Hold'em No Limit ($0.02/$0.05) - 2023/05/07 2:31:55 CUST [2023/05/07 1:31:55 ET]
+Table 'Donati' 6-max Seat #1 is the button
+Seat 1: KIKO_5K ($2.84 in chips)
+Seat 2: Hero or Dead ($5.14 in chips)
+Seat 3: oporto12 ($6.65 in chips)
+Seat 4: EvolaMorales69 ($5 in chips)
+Seat 5: COVID19 ($16.66 in chips)
+Seat 6: PS_SUCKS ($5.21 in chips)
+Hero or Dead: posts small blind $0.02
+oporto12: posts big blind $0.05
+*** HOLE CARDS ***
+Dealt to Hero or Dead [Qs 5h]
+EvolaMorales69: folds
+COVID19: folds
+PS_SUCKS: folds
+KIKO_5K: calls $0.05
+Hero or Dead: folds
+oporto12: raises $6.60 to $6.65 and is all-in
+KIKO_5K: folds
+Uncalled bet ($6.60) returned to oporto12
+oporto12 collected $0.12 from pot
+oporto12: doesn't show hand
+*** SUMMARY ***
+Total pot $0.12 | Rake $0
+Seat 1: KIKO_5K (button) folded before Flop
+Seat 2: Hero or Dead (small blind) folded before Flop
+Seat 3: oporto12 (big blind) collected ($0.12)
+Seat 4: EvolaMorales69 folded before Flop (didn't bet)
+Seat 5: COVID19 folded before Flop (didn't bet)
+Seat 6: PS_SUCKS folded before Flop (didn't bet)"""
