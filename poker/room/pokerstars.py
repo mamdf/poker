@@ -3,7 +3,6 @@ import typing as t
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
-from functools import cache
 
 import attr
 import pytz
@@ -20,7 +19,7 @@ __all__ = ["PokerStarsHandHistory", "Notes"]
 
 @implementer(hh.IStreet)
 class _Street(hh._BaseStreet):
-    _collected_re = re.compile(r"(.+) collected (?:\$|£|€)(\d+(\.\d+)?) from pot")
+    _collected_re = re.compile(r"(.+) collected (?:\$|£|€)?(\d+(\.\d+)?) from pot")
 
     def _parse_cards(self, boardline):
         self.cards = (Card(boardline[1:3]), Card(boardline[4:6]), Card(boardline[7:9]))
@@ -102,7 +101,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     _split_re = re.compile(r" ?\*\*\* ?\n?|\n")
     _header_re = re.compile(
         r"""
-                        .*PokerStars\s+                               # Poker Room
+                        .*PokerStars\s+(:?Zoom\s+)?                   # Poker Room
                         Hand\s+\#(?P<ident>\d+):\s+                   # Hand history id
                         (Tournament\s+\#(?P<tournament_ident>\d+),\s+ # Tournament Number
                          ((?P<freeroll>Freeroll)|(                    # buyin is Freeroll
@@ -121,8 +120,8 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
                           (\s+(?P<cash_currency>\S+))?                # cash currency
                          ))
                         \)\s+
-                        -\s+                                          # localized date
-                        (?P<date>.+?\s+ET)                            # ET date
+                        -\s+.+?\s+                                    # localized date
+                        \[(?P<date>.+?)\]                             # ET date
                         """,
         re.VERBOSE,
     )
@@ -133,11 +132,11 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         r"^Seat (?P<seat>\d+): (?P<name>.+?) \((?:\$|£|€)?(?P<stack>\d+(\.\d+)?) in chips\)"
     )  # noqa
     _blind_re = re.compile(
-        r"^(?P<name>.+?): posts (?P<blind>small|big|small & big) blind(?:s)? (?:\$|£|€)(?P<amount>\d+(\.\d+)?)")
+        r"^(?P<name>.+?): posts (?P<blind>small|big|small & big) blind(?:s)? (?:\$|£|€)?(?P<amount>\d+(\.\d+)?)")
     _hero_re = re.compile(r"^Dealt to (?P<hero_name>.+?) \[(..) (..)\]")
-    _pot_re = re.compile(r"^Total pot (?:\$|£|€)(\d+(?:\.\d+)?) .*\| Rake (?:\$|£|€)(\d+(?:\.\d+)?)")
+    _pot_re = re.compile(r"^Total pot (?:\$|£|€)?(\d+(?:\.\d+)?) .*\| Rake (?:\$|£|€)?(\d+(?:\.\d+)?)")
     _winner_re = re.compile(
-        r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}collected \((?:\$|£|€)(\d+(?:\.\d+)?)\)")
+        r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}collected \((?:\$|£|€)?(\d+(?:\.\d+)?)\)")
     _showdown_re = re.compile(
         r"^Seat (\d+): (.+?) (?:(?:^$|\(button\)|\(small blind\)|\(big blind\))\s){0,2}showed \[.+?\] and won \((?:\$|£|€)?(\d+(?:\.\d+)?)\) with \w+?")
     _ante_re = re.compile(r".*posts the ante (\d+(?:\.\d+)?)")
@@ -204,7 +203,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         self._parse_table()
         self._parse_players()
         self._parse_button()
-        # self._parse_hero()
+        self._parse_hero()
         self._parse_preflop()
         self._parse_flop()
         self._parse_street("flop")
@@ -215,7 +214,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         self._parse_board()
         self._parse_winners()
 
-        # self._del_split_vars()
+        self._del_split_vars()
         self.parsed = True
 
     def _parse_table(self):
@@ -254,7 +253,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
             self.button = hero
 
     def _parse_preflop(self):
-        start = self._sections[0] + 2
+        start = self._sections[0] + 3
         stop = self._sections[1]
         self.preflop_actions = tuple(self._splitted[start:stop])
 
