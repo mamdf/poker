@@ -1,7 +1,7 @@
 import collections
 import itertools
 from ._common import _ReprMixin
-from .card import Rank, Card
+from .card import Rank, Card, Suit
 
 __all__ = [
     "Board"
@@ -271,3 +271,18 @@ class Board(_ReprMixin):
             result += card.value
 
         return result
+
+    def suit_counts(self):
+        """
+        Returns a dictionary counting the number of cards of each suit on the board.
+        """
+        suit_counts = {suit: 0 for suit in Suit}
+        for card in self.cards:
+            suit_counts[card.suit] += 1
+        return suit_counts
+
+    def ranks_for_suit(self, suit):
+        """
+        Returns a list of ranks for cards of the specified suit on the board.
+        """
+        return [card.rank for card in self.cards if card.suit == suit]

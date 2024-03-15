@@ -364,6 +364,13 @@ class Combo(_ReprMixin):
     def value(self):
         return f"{self.first.value}{self.second.value}"
 
+    @property
+    def suits(self):
+        """
+        Returns a set of the suits present in the combo.
+        """
+        return {self.first.suit, self.second.suit}
+
 
 class _RegexRangeLexer:
     _separator_re = re.compile(r"[,;\s]+")
