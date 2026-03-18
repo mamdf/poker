@@ -23,6 +23,9 @@ Documentation
 
 https://poker.readthedocs.org/
 
+Fork-specific documentation for the additions in this repo is available in
+`docs/fork.rst <docs/fork.rst>`_.
+
 State of the project
 --------------------
 

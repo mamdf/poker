@@ -19,6 +19,7 @@ Contents
    handhistory
    website
    room
+   fork
    development
    glossary
    license
@@ -43,5 +44,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
 

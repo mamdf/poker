@@ -24,6 +24,8 @@ Rank
 
    Enumeration of the 13 :term:`Rank`\ s.
 
+   Face cards also accept their numeric values, and Ace can be created from both ``14`` and ``1``.
+
    .. automethod:: difference
 
       :param str,Rank first:
@@ -68,3 +70,6 @@ Card
 
       :type: :class:`Suit`
 
+   .. autoattribute:: value
+
+      ASCII serialization of the card, e.g. ``"As"`` or ``"Td"``.

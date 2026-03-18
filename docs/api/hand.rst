@@ -57,7 +57,7 @@ Combo
 
 .. autoclass:: poker.hand.Combo
    :members:
-   :exclude-members: first, second, shape
+   :exclude-members: first, second, shape, value, suits
    :undoc-members:
 
    See :term:`Combo`
@@ -73,6 +73,16 @@ Combo
    .. autoattribute:: shape
 
       :type:   :class:`Shape`
+
+   .. autoattribute:: value
+
+      :type: str
+
+      Canonical ASCII serialization of the combo, for example ``"AsKh"``.
+
+   .. autoattribute:: suits
+
+      :type: set of :class:`poker.card.Suit`
 
 
 Range
