@@ -128,6 +128,32 @@ def test_invalid_combination():
     with pytest.raises(ValueError):
         Combo("2s2s")
 
+
+# ---------------------------------------------------------------------------
+# Deepcopy / copy identity contract (immutable value object)
+# ---------------------------------------------------------------------------
+
+def test_deepcopy_combo_returns_same_object():
+    import copy
+    combo = Combo("AsKc")
+    result = copy.deepcopy(combo)
+    assert result is combo
+
+
+def test_copy_combo_returns_same_object():
+    import copy
+    combo = Combo("AsKc")
+    result = copy.copy(combo)
+    assert result is combo
+
+
+def test_deepcopy_list_of_combos_does_not_raise():
+    import copy
+    combos = [Combo("AsKc"), Combo("QhJd")]
+    result = copy.deepcopy(combos)
+    assert result[0] is combos[0]
+    assert result[1] is combos[1]
+
     with pytest.raises(ValueError):
         Combo("2222")
 
