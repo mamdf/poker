@@ -92,6 +92,14 @@ class Card(_ReprMixin, metaclass=_CardMeta):
             return self.rank == other.rank and self.suit == other.suit
         return NotImplemented
 
+    def __deepcopy__(self, memo):
+        # Card is an immutable value object — identity copy is correct.
+        return self
+
+    def __copy__(self):
+        # Card is an immutable value object — identity copy is correct.
+        return self
+
     def __lt__(self, other):
         if self.__class__ is not other.__class__:
             return NotImplemented
