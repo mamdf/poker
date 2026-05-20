@@ -144,3 +144,37 @@ def test_putting_them_in_set_doesnt_raise_Exception():
 
 def test_value():
     assert Card("As").value == "As"
+
+
+# ---------------------------------------------------------------------------
+# Deepcopy / copy identity contract (immutable value object)
+# ---------------------------------------------------------------------------
+
+def test_deepcopy_card_returns_same_object():
+    import copy
+    c = Card("Ah")
+    result = copy.deepcopy(c)
+    assert result is c
+
+
+def test_copy_card_returns_same_object():
+    import copy
+    c = Card("Ah")
+    result = copy.copy(c)
+    assert result is c
+
+
+def test_deepcopy_list_of_cards_does_not_raise():
+    import copy
+    cards = [Card("Ah"), Card("Kd")]
+    result = copy.deepcopy(cards)
+    assert result[0] is cards[0]
+    assert result[1] is cards[1]
+
+
+def test_deepcopy_dict_containing_cards_does_not_raise():
+    import copy
+    d = {"a": Card("Ah"), "b": Card("Kd")}
+    result = copy.deepcopy(d)
+    assert result["a"] is d["a"]
+    assert result["b"] is d["b"]
