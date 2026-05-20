@@ -32,7 +32,7 @@ classifiers = [
 
 setup(
     name="poker",
-    version="0.30.0",
+    version="0.30.1",
     description="Poker Framework",
     long_description=Path("README.rst").read_text(),
     classifiers=classifiers,
