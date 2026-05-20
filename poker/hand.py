@@ -273,6 +273,14 @@ class Combo(_ReprMixin):
             return self.first == other.first and self.second == other.second
         return NotImplemented
 
+    def __deepcopy__(self, memo):
+        # Combo is an immutable value object — identity copy is correct.
+        return self
+
+    def __copy__(self):
+        # Combo is an immutable value object — identity copy is correct.
+        return self
+
     def __lt__(self, other):
         if self.__class__ is not other.__class__:
             return NotImplemented
