@@ -695,11 +695,9 @@ class Range:
         The table's CSS class is ``range``, pair cells (td element) are ``pair``, offsuit hands are
         ``offsuit`` and suited hand cells has ``suited`` css class.
         The HTML contains no extra whitespace at all.
-        Calculating it should not take more than 30ms (which takes calculating a 100% range).
         """
 
-        # note about speed: I tried with functools.lru_cache, and the initial call was 3-4x slower
-        # than without it, and the need for calling this will usually be once, so no need to cache
+        # Not cached: it is usually called once, and functools.lru_cache only adds overhead on the initial call.
 
         html = ['<table class="range">']
 
